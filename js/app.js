@@ -1,10 +1,16 @@
 function Calculator() {
-  this.actions = ["+", "-", "*", "/", "^"];
   this.history = [];
+  this.actions = {
+    "+": (a, b) => this.add(a, b),
+    "-": (a, b) => this.subtract(a, b),
+    "*": (a, b) => this.multiplay(a, b),
+    "/": (a, b) => this.divide(a, b),
+    "^": (a, b) => this.power(a, b),
+  };
 }
 
 Calculator.prototype.isCorrectAction = function (action) {
-  return this.actions.includes(action);
+  return typeof this.actions[action] === "function";
 };
 
 Calculator.prototype.getHistoryAsString = function () {
@@ -16,16 +22,16 @@ Calculator.prototype.add = function (num1, num2) {
   this.history.push(`${num1} + ${num2} = ${res}`);
 };
 
-Calculator.prototype.sub = function (num1, num2) {
+Calculator.prototype.subtract = function (num1, num2) {
   const res = num1 - num2;
   this.history.push(`${num1} - ${num2} = ${res}`);
 };
-Calculator.prototype.mul = function (num1, num2) {
+Calculator.prototype.multiplay = function (num1, num2) {
   const res = num1 * num2;
   this.history.push(`${num1} * ${num2} = ${res}`);
 };
 
-Calculator.prototype.div = function (num1, num2) {
+Calculator.prototype.divide = function (num1, num2) {
   if (num2 === 0) {
     this.history.push(`Error: Cannot divide by zero.`);
   } else {
@@ -34,7 +40,7 @@ Calculator.prototype.div = function (num1, num2) {
   }
 };
 
-Calculator.prototype.pwr = function (num1, num2) {
+Calculator.prototype.power = function (num1, num2) {
   let str = num1;
   let res = 1;
   let i = 1;
@@ -46,35 +52,25 @@ Calculator.prototype.pwr = function (num1, num2) {
 
   this.history.push(`${str} = ${res}`);
 };
-
-Calculator.prototype.calc = function (num1, num2, action) {
-  num1 = +num1;
-  num2 = +num2;
-
+Calculator.prototype.isNumInputValid = function (num1, num2) {
   if (
     typeof num1 === "number" &&
     !isNaN(num1) &&
     typeof num2 === "number" &&
     !isNaN(num2)
   ) {
-    switch (action) {
-      case "+":
-        this.add(num1, num2);
-        break;
-      case "-":
-        this.sub(num1, num2);
-        break;
-      case "*":
-        this.mul(num1, num2);
-        break;
-      case "/":
-        this.div(num1, num2);
-        break;
-      case "^":
-        this.pwr(num1, num2);
-        break;
-      default:
-        console.log("Unknown operator");
+    return true;
+  }
+};
+
+Calculator.prototype.calc = function (num1, num2, action) {
+  num1 = +num1;
+  num2 = +num2;
+
+  if (this.isNumInputValid(num1, num2)) {
+    const operationFunc = this.actions[action];
+    if (typeof operationFunc === "function") {
+      operationFunc(num1, num2);
     }
   }
 };
